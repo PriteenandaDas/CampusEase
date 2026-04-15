@@ -1,0 +1,16 @@
+.choice-card {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.choice-card:hover {
+  background-color: #f4efe9; /* light coffee/cream tone */
+  transform: translateY(-5px); /* subtle lift */
+}
+
+.choice-card .card-title {
+  color: #333; /* dark gray/black */
+}
+
+.choice-card .card-text {
+  color: #555; /* medium gray */
+}

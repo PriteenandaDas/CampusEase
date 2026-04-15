@@ -1,0 +1,98 @@
+/* ---------------- LOGIN PAGE ---------------- */
+
+/* Card styling */
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Left image overlay */
+.login-overlay {
+  background: rgba(46, 61, 71, 0.60);
+  color: white;
+  padding: 40px; 
+  inset: 0;
+}
+
+.login-overlay h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.login-overlay p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Coffee brown button */
+.btn-coffee {
+  background-color: #7a4f37; /* coffee brown */
+  color: white;
+  border: none;
+}
+
+.btn-coffee:hover {
+  background-color: #633f2c; /* darker coffee shade */
+  color: white;
+}
+
+/* Links */
+.auth-link {
+  color: #7a4f37;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ---------------- SIGNUP PAGE ---------------- */
+
+/* PAGE BACKGROUND */
+.auth-page {
+  min-height: 100vh;
+  background-color: #f7f1ea; /* light beige campus tone */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MAIN CARD */
+.auth-card {
+  background: #fffaf4; /* off-white card */
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+/* BUTTON THEME */
+.btn-primary {
+  background-color: #7a4f37; /* coffee brown */
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #633f2c; /* darker coffee shade */
+}
+
+/* LINKS */
+.auth-link,
+.signup-text a {
+  color: #7a4f37;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* RIGHT INFO SECTION */
+.auth-info-section {
+  background-color: #f1e6da; /* warm beige */
+  padding: 30px;
+  text-align: center;
+}
+
+.auth-info-section h3 {
+  color: #333;
+}
+
+.auth-info-section p {
+  color: #555;
+}

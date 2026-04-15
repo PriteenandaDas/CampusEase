@@ -1,0 +1,28 @@
+.footer {
+  background-color: rgb(103, 75, 53); /* keep your brown theme */
+  border-top: 1px solid #ccc;
+}
+html, body {
+  height: 100%;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+footer {
+  margin-top: auto;
+}
+
+
+.footer-link {
+  color: aliceblue; /* override Bootstrap link color */
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.footer_copy {
+  margin: 0;
+}

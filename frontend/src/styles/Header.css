@@ -1,0 +1,26 @@
+/* Coffee brown navbar background */
+.custom-navbar {
+  background-color: rgb(85 57 39); /* rich coffee brown */
+}
+
+/* Signup button in lighter coffee shade */
+.btn-coffee {
+  background-color: rgb(46, 39, 31); /* lighter coffee brown */
+  color: white;
+  border: none;
+}
+
+.btn-coffee:hover {
+  background-color: #8b6449; /* slightly darker on hover */
+  color: white;
+}
+
+.bg-coffee {
+  background-color: #543927; /* campus coffee tone */
+}
+
+.dropdown-item:hover { 
+  background-color: #6b4a34; 
+  border-radius: 6px;
+}
+
