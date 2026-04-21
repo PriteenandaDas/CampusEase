@@ -17,6 +17,7 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
   const [selectedResource, setSelectedResource] = useState(null);
+  const [bookedSlots, setBookedSlots] = useState([]);
 
   // ✅ FETCH SERVICE (FIXED _id)
   const fetchServiceInfo = () => {
@@ -81,7 +82,14 @@ const Appointment = () => {
     if (serviceInfo) getAvailableSlots();
   }, [serviceInfo]);
 
-  const handleBooking = () => {
+  useEffect(() => {
+  if (selectedResource) {
+    fetchBookedSlots();
+  }
+}, [selectedResource, slotIndex]);
+
+ const handleBooking = async () => {
+  try {
     // Not logged in
     if (!isLoggedIn) {
       toast.error("Please login first to book appointment");
@@ -89,21 +97,98 @@ const Appointment = () => {
       return;
     }
 
-    // Not a student
+    // Only students can book
     if (userData?.role !== "student") {
       toast.error("Only students can book appointments");
       return;
     }
 
-    // No slot or resource selected
-    if (!slotTime || !selectedResource) {
-      toast.error("Please select resource and time slot");
+    // Validation
+    if (!selectedResource) {
+      toast.error("Please select a resource");
       return;
     }
 
-    // Proceed booking (later API call)
-    toast.success("Booking successful (demo)");
-  };
+    if (!slotTime) {
+      toast.error("Please select a time slot");
+      return;
+    }
+
+    // Get selected date
+    const selectedDate =
+      serviceSlot[slotIndex]?.[0]?.datetime;
+
+    if (!selectedDate) {
+      toast.error("Please select a date");
+      return;
+    }
+
+    const appointmentData = {
+      resourceId: selectedResource._id,
+      appointmentDate: selectedDate.toISOString(),
+      timeSlot: slotTime,
+      notes: `Appointment for ${serviceInfo.name}`,
+    };
+
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/appointment/book/${serviceId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(appointmentData),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast.success(data.message);
+
+      fetchBookedSlots();
+
+      // reset selection
+      setSelectedResource(null);
+      setSlotTime("");
+
+      // optional redirect
+      navigate("/student-dashboard");
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Booking failed");
+  }
+};
+
+const fetchBookedSlots = async () => {
+  try {
+    if (!selectedResource) return;
+
+    const selectedDate =
+      serviceSlot[slotIndex]?.[0]?.datetime;
+
+    if (!selectedDate) return;
+
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/appointment/booked-slots?resourceId=${selectedResource._id}&date=${selectedDate.toISOString()}`,
+      {
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      setBookedSlots(data.bookedSlots);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <div className="container my-5">
@@ -195,17 +280,26 @@ const Appointment = () => {
 
         {/* TIME */}
         <div className="d-flex flex-wrap justify-content-center mt-4">
-          {serviceSlot[slotIndex]?.map((slot, index) => (
-            <button
-              key={index}
-              className={`btn me-2 mb-2 rounded-pill ${
-                slotTime === slot.time ? "btn-primary" : "btn-outline-secondary"
-              }`}
-              onClick={() => setSlotTime(slot.time)}
-            >
-              {slot.time}
-            </button>
-          ))}
+         {serviceSlot[slotIndex]?.map((slot, index) => {
+  const isBooked = bookedSlots.includes(slot.time);
+
+  return (
+    <button
+      key={index}
+      disabled={isBooked}
+      className={`btn me-2 mb-2 rounded-pill ${
+        isBooked
+          ? "btn-danger disabled"
+          : slotTime === slot.time
+          ? "btn-primary"
+          : "btn-outline-secondary"
+      }`}
+      onClick={() => !isBooked && setSlotTime(slot.time)}
+    >
+      {slot.time}
+    </button>
+  );
+})}
         </div>
 
         {/* BOOK BUTTON */}

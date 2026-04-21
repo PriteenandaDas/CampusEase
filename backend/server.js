@@ -9,6 +9,7 @@ import connectCloudinary from "./config/cloudinary.js";
 import authRouter from "./routes/authRoutes.js";
 import resourceRouter from "./routes/resourceRoutes.js";
 import serviceRouter from "./routes/serviceRoutes.js";
+import appointmentRouter from "./routes/appointmentRoutes.js";
 
 //app config
 const app = express();
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", authRouter);
 app.use("/api/resource", resourceRouter);
 app.use("/api/service", serviceRouter);
+app.use("/api/appointment", appointmentRouter);
 
 app.listen(port, () => {
   console.log(`server is started on the port http://localhost:${port}`);

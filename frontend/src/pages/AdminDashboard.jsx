@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("summary");
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -12,14 +12,9 @@ const AdminDashboard = () => {
   const [teachers, setTeachers] = useState([]);
   const [services, setServices] = useState([]);
   const [resources, setResources] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
-  const [latestBookings, setLatestBookings] = useState([
-    { id: 1, name: "John Doe", service: "Library", time: "10:00 AM" },
-    { id: 2, name: "Alice", service: "Gym", time: "11:00 AM" },
-    { id: 3, name: "Bob", service: "Washing Machine", time: "12:00 PM" },
-    { id: 4, name: "Emma", service: "Study Room", time: "1:00 PM" },
-    { id: 5, name: "David", service: "Common Room", time: "2:00 PM" },
-  ]);
+  const latestBookings = appointments.slice(0, 5);
 
   // Sidebar Menu
   const menuItems = [
@@ -91,11 +86,33 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/appointment/all`, {
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // latest first
+        const sortedAppointments = data.appointments.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+
+        setAppointments(sortedAppointments);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
     fetchTeachers();
     fetchServices();
     fetchResources();
+    fetchAppointments();
   }, []);
 
   return (
@@ -160,15 +177,19 @@ const AdminDashboard = () => {
                   <tr>
                     <th>Name</th>
                     <th>Service</th>
+                    <th>Date</th>
                     <th>Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {latestBookings.map((booking) => (
-                    <tr key={booking.id}>
-                      <td>{booking.name}</td>
-                      <td>{booking.service}</td>
-                      <td>{booking.time}</td>
+                    <tr key={booking._id}>
+                      <td>{booking.studentId?.fullname}</td>
+                      <td>{booking.serviceId?.name}</td>
+                      <td>
+                        {new Date(booking.appointmentDate).toLocaleDateString()}
+                      </td>
+                      <td>{booking.timeSlot}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -180,22 +201,26 @@ const AdminDashboard = () => {
         {/* OTHER SECTIONS */}
         {activeTab === "services" && (
           <>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>Services List</h3>
-            
-            <button
-              className="btn text-white"
-              style={{ background: "#342516" }}
-              onClick={() => navigate("/admin-dashboard/add-service")}
-            >
-              + Add New Services
-            </button>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h3>Services List</h3>
+
+              <button
+                className="btn text-white"
+                style={{ background: "#342516" }}
+                onClick={() => navigate("/admin-dashboard/add-service")}
+              >
+                + Add New Services
+              </button>
             </div>
             <div className="row mt-4">
               {services.map((t) => (
                 <div className="col-lg-3 col-md-4 col-sm-6 mb-4" key={t._id}>
-                  <div className="card shadow text-center p-3 hover-card"
-                   onClick={() => navigate(`/admin-dashboard/service/${t._id}`)}>
+                  <div
+                    className="card shadow text-center p-3 hover-card"
+                    onClick={() =>
+                      navigate(`/admin-dashboard/service/${t._id}`)
+                    }
+                  >
                     <img
                       src={t.image}
                       alt={t.name}
@@ -217,22 +242,26 @@ const AdminDashboard = () => {
         )}
         {activeTab === "resources" && (
           <>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>Resources List</h3>
-            
-            <button
-              className="btn text-white"
-              style={{ background: "#342516" }}
-              onClick={() => navigate("/admin-dashboard/add-resource")}
-            >
-              + Add New Resource
-            </button>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h3>Resources List</h3>
+
+              <button
+                className="btn text-white"
+                style={{ background: "#342516" }}
+                onClick={() => navigate("/admin-dashboard/add-resource")}
+              >
+                + Add New Resource
+              </button>
             </div>
             <div className="row mt-4">
               {resources.map((t) => (
                 <div className="col-lg-3 col-md-4 col-sm-6 mb-4" key={t._id}>
-                  <div className="card shadow text-center p-3 hover-card"
-                   onClick={() => navigate(`/admin-dashboard/resource/${t._id}`)}>
+                  <div
+                    className="card shadow text-center p-3 hover-card"
+                    onClick={() =>
+                      navigate(`/admin-dashboard/resource/${t._id}`)
+                    }
+                  >
                     <img
                       src={t.image}
                       alt={t.name}
@@ -252,7 +281,65 @@ const AdminDashboard = () => {
             </div>
           </>
         )}
-        {activeTab === "appointments" && <h3>Appointments</h3>}
+        {activeTab === "appointments" && (
+          <>
+            <h3 className="mb-4">All Appointments</h3>
+
+            <div className="card shadow p-3">
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Service</th>
+                    <th>Resource</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {appointments.length > 0 ? (
+                    appointments.map((appt) => (
+                      <tr key={appt._id}>
+                        <td>{appt.studentId?.fullname}</td>
+                        <td>{appt.serviceId?.name}</td>
+                        <td>{appt.resourceId?.name}</td>
+                        <td>
+                          {new Date(appt.appointmentDate).toLocaleDateString()}
+                        </td>
+                        <td>{appt.timeSlot}</td>
+                        <td>
+                          <span
+                            className={`badge ${
+                              appt.status === "pending"
+                                ? "bg-secondary"
+                                : appt.status === "approved"
+                                  ? "bg-success-subtle text-success"
+                                  : appt.status === "completed"
+                                    ? "bg-success"
+                                    : appt.status === "cancelled"
+                                      ? "bg-danger"
+                                      : "bg-secondary"
+                            }`}
+                          >
+                            {appt.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="text-center">
+                        No appointments found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
         {activeTab === "students" && (
           <>
             <h3>Student List</h3>
