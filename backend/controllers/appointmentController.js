@@ -1,25 +1,6 @@
 import appointmentModel from "../models/appointmentModel.js";
 import resourceModel from "../models/resourceModel.js";
 import userModel from "../models/userModel.js";
-import cron from "node-cron";
-
-// Run every 5 minutes
-cron.schedule("*/5 * * * *", async () => {
-  const now = new Date();
-
-  // Find approved appointments whose slot has passed
-  const appointments = await appointmentModel.find({
-    status: "approved",
-    appointmentDate: { $lt: now }
-  });
-
-  for (const appt of appointments) {
-    appt.status = "completed";
-    await appt.save();
-  }
-
-  console.log(`Auto-completed ${appointments.length} appointments`);
-});
 
 //Book Appointment
 export const createAppointment = async (req, res) => {

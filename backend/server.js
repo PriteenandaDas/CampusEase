@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
+import "./utils/appointmentCron.js";
 
 import authRouter from "./routes/authRoutes.js";
 import resourceRouter from "./routes/resourceRoutes.js";
